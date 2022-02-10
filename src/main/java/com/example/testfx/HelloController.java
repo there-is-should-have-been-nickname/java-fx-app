@@ -9,6 +9,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.io.*;
 
 public class HelloController {
+    //Required variables for input and output data
     @FXML
     private TextField inputFileName;
 
@@ -20,11 +21,10 @@ public class HelloController {
 
     @FXML
     private TableColumn<Row, String> columnContent;
-
+    //Required array for storage data
     @FXML
     private ObservableList<Row> dataRows = FXCollections.observableArrayList();
-
-
+    //Method for downloading file and output data to table
     @FXML
     protected void downloadFile() {
         String fileName = inputFileName.getText();
@@ -35,24 +35,21 @@ public class HelloController {
 
             FileReader fr = new FileReader(file);
             BufferedReader br = new BufferedReader(fr);
-
-
+            //Clearing table if table isn't empty
             clearTable();
 
             String line = br.readLine();
             ++count;
-
+            //Reading file lines and adding instance of class to data array
             while (line != null) {
                 dataRows.add(new Row(Integer.toString(count), line));
 
                 line = br.readLine();
                 ++count;
             }
-
+            //Binding columns to class property and setting array data to table
             columnNum.setCellValueFactory(new PropertyValueFactory<Row, String>("number"));
             columnContent.setCellValueFactory(new PropertyValueFactory<Row, String>("content"));
-
-
             tableView.setItems(dataRows);
         } catch (FileNotFoundException e) {
             System.out.println("Cant find the file");
@@ -60,7 +57,7 @@ public class HelloController {
             System.out.println("Cant read the file");
         }
     }
-
+    //Method for clearing data from array
     @FXML
     protected void clearTable() {
         dataRows.clear();
