@@ -7,14 +7,14 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.*;
 
 public class HelloController {
     //Required variables for input and output data
-    @FXML
-    private TextField inputFileName;
-
     @FXML
     private TableView<Row> tableView;
 
@@ -31,13 +31,15 @@ public class HelloController {
     private ObservableList<Row> dataRows = FXCollections.observableArrayList();
     //Method for downloading file and output data to table
     @FXML
-    protected void downloadFile() {
-        String fileName = inputFileName.getText();
+    protected void openFile() {
+        FileChooser fileChooser = new FileChooser();
+        Stage stage = (Stage) tableView.getScene().getWindow();
+
         int count = 0;
 
         try {
-            File file = new File( "./src/main/files/" + fileName + ".txt");
 
+            File file = fileChooser.showOpenDialog(stage);
             FileReader fr = new FileReader(file);
             BufferedReader br = new BufferedReader(fr);
             //Clearing table if table isn't empty
@@ -62,8 +64,6 @@ public class HelloController {
             columnContent.setCellValueFactory(new PropertyValueFactory<Row, String>("content"));
             columnImageView.setCellValueFactory(new PropertyValueFactory<Row, ImageView>("imageView"));
             tableView.setItems(dataRows);
-        } catch (FileNotFoundException e) {
-            System.out.println("Cant find the file");
         } catch (IOException e) {
             System.out.println("Cant read the file");
         }
