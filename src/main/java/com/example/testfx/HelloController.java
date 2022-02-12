@@ -5,6 +5,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import java.io.*;
 
@@ -21,6 +23,9 @@ public class HelloController {
 
     @FXML
     private TableColumn<Row, String> columnContent;
+
+    @FXML
+    private TableColumn<Row, ImageView> columnImageView;
     //Required array for storage data
     @FXML
     private ObservableList<Row> dataRows = FXCollections.observableArrayList();
@@ -42,14 +47,20 @@ public class HelloController {
             ++count;
             //Reading file lines and adding instance of class to data array
             while (line != null) {
-                dataRows.add(new Row(Integer.toString(count), line));
+                String content = line.split(",")[0];
+                String filePath = line.split(",")[1];
+                ImageView imageView = new ImageView(new Image("C:\\Users\\ACER\\Desktop\\Projects\\java-fx-app\\src\\main\\files\\"+ filePath + ".jpg"));
+
+                dataRows.add(new Row(Integer.toString(count), content, imageView));
 
                 line = br.readLine();
+
                 ++count;
             }
             //Binding columns to class property and setting array data to table
             columnNum.setCellValueFactory(new PropertyValueFactory<Row, String>("number"));
             columnContent.setCellValueFactory(new PropertyValueFactory<Row, String>("content"));
+            columnImageView.setCellValueFactory(new PropertyValueFactory<Row, ImageView>("imageView"));
             tableView.setItems(dataRows);
         } catch (FileNotFoundException e) {
             System.out.println("Cant find the file");

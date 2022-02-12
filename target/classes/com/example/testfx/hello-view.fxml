@@ -43,8 +43,9 @@
       </RadioButton>
       <TableView id="tableView" fx:id="tableView" maxWidth="-Infinity" prefHeight="300.0" prefWidth="375.0">
         <columns>
-          <TableColumn id="columnNum" fx:id="columnNum" editable="false" prefWidth="115.0" resizable="false" text="Номер строки" />
-          <TableColumn id="columnContent" fx:id="columnContent" editable="false" prefWidth="260.0" resizable="false" text="Содержимое" />
+          <TableColumn id="columnNum" fx:id="columnNum" editable="false" prefWidth="115.0" resizable="false" style="-fx-alignment: CENTER;" text="Номер строки" />
+          <TableColumn id="columnContent" fx:id="columnContent" editable="false" prefWidth="150.0" resizable="false" style="-fx-alignment: CENTER;" text="Содержимое" />
+            <TableColumn id="columnImageView" fx:id="columnImageView" prefWidth="110.0" style="-fx-alignment: CENTER;" text="Изображение" />
         </columns>
          <VBox.margin>
             <Insets top="-80.0" />
