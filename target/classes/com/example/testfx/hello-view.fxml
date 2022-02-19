@@ -36,7 +36,6 @@
         <columns>
           <TableColumn id="columnNum" fx:id="columnExtension" editable="false" prefWidth="100.0" resizable="false" style="-fx-alignment: CENTER;" text="Расширение" />
           <TableColumn id="columnContent" fx:id="columnSize" editable="false" prefWidth="125.0" resizable="false" style="-fx-alignment: CENTER;" text="Размер" />
-<!--            <TableColumn id="columnImageView" fx:id="columnContent" prefWidth="400.0" style="-fx-alignment: CENTER;" text="Содержимое" />-->
         </columns>
          <VBox.margin>
             <Insets top="-80.0" />

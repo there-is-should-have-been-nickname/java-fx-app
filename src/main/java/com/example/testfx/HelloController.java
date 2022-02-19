@@ -5,8 +5,15 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import org.apache.poi.xslf.usermodel.SlideLayout;
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
 import java.io.*;
 import java.util.Objects;
@@ -22,14 +29,13 @@ public class HelloController {
     @FXML
     private TableColumn<Row, String> columnSize;
 
-    @FXML
-    private TableColumn<Row, String> columnContent;
     //Required array for storage data
     @FXML
     private ObservableList<Row> dataRows = FXCollections.observableArrayList();
     //Method for downloading file and output data to table
     @FXML
     protected void openFile() {
+
         FileChooser fileChooser = new FileChooser();
         Stage stage = (Stage) tableView.getScene().getWindow();
 
@@ -42,37 +48,39 @@ public class HelloController {
             String extension = file.getName().split("\\.")[1];
             String size = String.format("%.3f", (double)file.length() / 1024) + " Кб";
 
-            //Binding columns to class property and setting array data to table
             columnExtension.setCellValueFactory(new PropertyValueFactory<Row, String>("extension"));
             columnSize.setCellValueFactory(new PropertyValueFactory<Row, String>("size"));
 
+            deleteLastColumn();
+
 
             if (Objects.equals(extension, "txt")) {
-                String content = br.readLine();
-
                 String line = br.readLine();
+                String text = line;
 
-                //Reading file lines and adding instance of class to data array
                 while (line != null) {
-//                ImageView imageView = new ImageView(new Image("C:\\Users\\ACER\\Desktop\\Projects\\java-fx-app\\src\\main\\files\\"+ "img2" + ".jpg"));
                     line = br.readLine();
-                    content += line + '\n';
+                    text += line + '\n';
                 }
-                dataRows.add(new Row(extension, size, content));
-                //Binding columns to class property and setting array data to table
-                TableColumn<Row, String> tableColumn = new TableColumn<>();
-                tableColumn.setPrefWidth(400);
-                tableColumn.setText("Содержимое");
-                tableColumn.setCellValueFactory(new PropertyValueFactory<Row, String>("content"));
+                addColumn(extension, size, text);
+            } else if (Objects.equals(extension, "docx")) {
+                String text = "";
+                FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
+                XWPFDocument document = new XWPFDocument(fileInputStream);
 
-                tableView.getColumns().add(tableColumn);
+                var paragraphs = document.getParagraphs();
+                for (org.apache.poi.xwpf.usermodel.XWPFParagraph par : paragraphs) {
+                    text += par.getText() + '\n';
+                }
+                fileInputStream.close();
 
+                addColumn(extension, size, text);
             }
-//            } else {
-//                //Binding columns to class property and setting array data to table
-//                columnContent.setCellValueFactory(new PropertyValueFactory<Row, ImageView>("content"));
-//            }
 
+            else if (Objects.equals(extension, "jpg")) {
+                ImageView imageView = new ImageView(new Image(file.getAbsolutePath()));
+                addColumn(extension, size, imageView);
+            }
 
 
             tableView.setItems(dataRows);
@@ -85,4 +93,21 @@ public class HelloController {
     protected void clearTable() {
         dataRows.clear();
     }
+    @FXML
+    protected void deleteLastColumn() {
+        if (tableView.getColumns().size() == 3) {
+            tableView.getColumns().remove(2);
+        }
+    }
+    @FXML
+    protected <T> void addColumn(String extension, String size, T data) {
+        dataRows.add(new Row(extension, size, data));
+        TableColumn<Row, T> tableColumn = new TableColumn<>();
+        tableColumn.setPrefWidth(400);
+        tableColumn.setText("Содержимое");
+        tableColumn.setCellValueFactory(new PropertyValueFactory<Row, T>("content"));
+
+        tableView.getColumns().add(tableColumn);
+    }
+
 }
