@@ -4,37 +4,37 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 //Class for one row in table
-public class Row {
-    public String number;
-    public String content;
-    public ImageView imageView;
+public class Row<T> {
+    public String extension;
+    public String size;
+    public T content;
 
-    public Row(String number, String content, ImageView imageView) {
-        this.number = number;
+    public Row(String extension, String size, T content) {
+        this.extension = extension;
+        this.size = size;
         this.content = content;
-        this.imageView = imageView;
     }
 
     public Row() {
     }
 
-    public String getNumber() {
-        return number;
+    public String getExtension() {
+        return extension;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setExtension(String number) {
+        this.extension = number;
     }
 
-    public String getContent() {
-        return content;
+    public String getSize() {
+        return size;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setSize(String content) {
+        this.size = content;
     }
 
-    public ImageView getImageView() { return imageView; }
+    public T getContent() { return content; }
 
-    public void setImageView(ImageView imageView) { this.imageView = imageView; }
+    public void setContent(T content) { this.content = content; }
 }

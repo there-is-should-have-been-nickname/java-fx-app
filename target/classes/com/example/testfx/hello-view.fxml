@@ -8,7 +8,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="400.0" prefWidth="600.0" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.testfx.HelloController">
+<VBox prefHeight="500.0" prefWidth="800.0" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.testfx.HelloController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -24,19 +24,19 @@
       </ToolBar>
       <RadioButton mnemonicParsing="false" text="RadioButton">
          <VBox.margin>
-            <Insets left="400.0" />
+            <Insets left="650.0" />
          </VBox.margin>
       </RadioButton>
       <RadioButton mnemonicParsing="false" text="RadioButton">
          <VBox.margin>
-            <Insets left="400.0" />
+            <Insets left="650.0" />
          </VBox.margin>
       </RadioButton>
-      <TableView id="tableView" fx:id="tableView" maxWidth="-Infinity" prefHeight="300.0" prefWidth="375.0">
+      <TableView id="tableView" fx:id="tableView" maxWidth="-Infinity" prefHeight="400.0" prefWidth="625.0">
         <columns>
-          <TableColumn id="columnNum" fx:id="columnNum" editable="false" prefWidth="115.0" resizable="false" style="-fx-alignment: CENTER;" text="Номер строки" />
-          <TableColumn id="columnContent" fx:id="columnContent" editable="false" prefWidth="150.0" resizable="false" style="-fx-alignment: CENTER;" text="Содержимое" />
-            <TableColumn id="columnImageView" fx:id="columnImageView" prefWidth="110.0" style="-fx-alignment: CENTER;" text="Изображение" />
+          <TableColumn id="columnNum" fx:id="columnExtension" editable="false" prefWidth="100.0" resizable="false" style="-fx-alignment: CENTER;" text="Расширение" />
+          <TableColumn id="columnContent" fx:id="columnSize" editable="false" prefWidth="125.0" resizable="false" style="-fx-alignment: CENTER;" text="Размер" />
+<!--            <TableColumn id="columnImageView" fx:id="columnContent" prefWidth="400.0" style="-fx-alignment: CENTER;" text="Содержимое" />-->
         </columns>
          <VBox.margin>
             <Insets top="-80.0" />
