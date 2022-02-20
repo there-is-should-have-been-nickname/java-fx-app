@@ -1,3 +1,0 @@
-bank,img
-second line,img4
-no,img5
