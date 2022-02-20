@@ -51,7 +51,6 @@ public class HelloController {
             FileReader fr = new FileReader(file);
             BufferedReader br = new BufferedReader(fr);
 
-
             String extension = file.getName().split("\\.")[1];
             String size = String.format("%.3f", (double) file.length() / 1024) + " Кб";
 
@@ -62,14 +61,8 @@ public class HelloController {
 
 
             if (Objects.equals(extension, "txt")) {
-                String line = br.readLine();
-                String text = line;
-
-                while (line != null) {
-                    text += line + '\n';
-                    line = br.readLine();
-                }
-                addColumn(extension, size, text);
+                String content = getTxtContent(br);
+                addColumn(extension, size, content);
             } else if (Objects.equals(extension, "docx")) {
                 String content = getDocxContent(file.getAbsolutePath());
                 addColumn(extension, size, content);
@@ -85,7 +78,6 @@ public class HelloController {
                 ImageView imageView = new ImageView(new Image(file.getAbsolutePath()));
                 addColumn(extension, size, imageView);
             }
-
 
             tableView.setItems(dataRows);
         } catch (IOException e) {
@@ -113,15 +105,35 @@ public class HelloController {
         tableColumn.setPrefWidth(400);
         tableColumn.setText("Содержимое");
 
+
 //        tableColumn.setCellFactory(param -> {
-//            TableCell<Row, T> cell = new TableCell<>();
-//            cell.setWrapText(true);
-//            cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
+//            WrapTextTableCell cell = new WrapTextTableCell<>();
 //            return cell;
 //        });
         tableColumn.setCellValueFactory(new PropertyValueFactory<Row, T>("content"));
 
         tableView.getColumns().add(tableColumn);
+    }
+
+
+
+    @FXML
+    protected String getTxtContent(BufferedReader br) {
+        String text = "";
+
+        try {
+            String line = br.readLine();
+            text = line;
+
+            while (line != null) {
+                text += line + '\n';
+                line = br.readLine();
+            }
+        } catch (Exception err) {
+            System.out.println("Cant read the file");
+        }
+
+        return text;
     }
 
     @FXML
