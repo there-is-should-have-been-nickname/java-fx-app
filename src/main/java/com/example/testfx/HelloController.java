@@ -11,6 +11,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javafx.util.Callback;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xslf.usermodel.SlideLayout;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
@@ -57,21 +58,26 @@ public class HelloController {
             columnExtension.setCellValueFactory(new PropertyValueFactory<Row, String>("extension"));
             columnSize.setCellValueFactory(new PropertyValueFactory<Row, String>("size"));
 
-            deleteLastColumn();
-
-
             if (Objects.equals(extension, "txt")) {
                 String content = getTxtContent(br);
-                addColumn(extension, size, content);
+                Text text = new Text(content);
+                text.setWrappingWidth(410);
+                addColumn(extension, size, text);
             } else if (Objects.equals(extension, "docx")) {
                 String content = getDocxContent(file.getAbsolutePath());
-                addColumn(extension, size, content);
+                Text text = new Text(content);
+                text.setWrappingWidth(410);
+                addColumn(extension, size, text);
             } else if (Objects.equals(extension, "xlsx")) {
                 String content = getXlsxContent(file.getAbsolutePath());
-                addColumn(extension, size, content);
+                Text text = new Text(content);
+                text.setWrappingWidth(410);
+                addColumn(extension, size, text);
             } else if (Objects.equals(extension, "pptx")) {
                 String content = getPptxContent(file.getAbsolutePath());
-                addColumn(extension, size, content);
+                Text text = new Text(content);
+                text.setWrappingWidth(410);
+                addColumn(extension, size, text);
             } else if (Objects.equals(extension, "jpg")
                     || Objects.equals(extension, "png")
                     || Objects.equals(extension, "bmp")) {
@@ -92,29 +98,29 @@ public class HelloController {
     }
 
     @FXML
-    protected void deleteLastColumn() {
-        if (tableView.getColumns().size() == 3) {
-            tableView.getColumns().remove(2);
+    protected <T> void addColumn(String extension, String size, T data) {
+        dataRows.add(new Row(extension, size, data));
+
+        TableColumn<Row, T> tableColumn;
+        tableColumn = getLastColumn();
+        tableColumn.setCellValueFactory(new PropertyValueFactory<Row, T>("content"));
+
+        if (tableView.getColumns().size() == 2) {
+            tableView.getColumns().add(tableColumn);
         }
     }
 
     @FXML
-    protected <T> void addColumn(String extension, String size, T data) {
-        dataRows.add(new Row(extension, size, data));
-        TableColumn<Row, T> tableColumn = new TableColumn<>();
-        tableColumn.setPrefWidth(400);
-        tableColumn.setText("Содержимое");
-
-
-//        tableColumn.setCellFactory(param -> {
-//            WrapTextTableCell cell = new WrapTextTableCell<>();
-//            return cell;
-//        });
-        tableColumn.setCellValueFactory(new PropertyValueFactory<Row, T>("content"));
-
-        tableView.getColumns().add(tableColumn);
+    protected <T> TableColumn<Row, T> getLastColumn() {
+        if (tableView.getColumns().size() == 2) {
+            TableColumn<Row, T> tableColumn = new TableColumn<Row, T>();
+            tableColumn.setText("Содержимое");
+            tableColumn.setPrefWidth(413);
+            return tableColumn;
+        } else {
+            return (TableColumn<Row, T>)tableView.getColumns().get(2);
+        }
     }
-
 
 
     @FXML
@@ -123,7 +129,6 @@ public class HelloController {
 
         try {
             String line = br.readLine();
-            text = line;
 
             while (line != null) {
                 text += line + '\n';
