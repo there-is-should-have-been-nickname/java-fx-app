@@ -58,31 +58,35 @@ public class HelloController {
             columnExtension.setCellValueFactory(new PropertyValueFactory<Row, String>("extension"));
             columnSize.setCellValueFactory(new PropertyValueFactory<Row, String>("size"));
 
-            if (Objects.equals(extension, "txt")) {
-                String content = getTxtContent(br);
-                Text text = new Text(content);
-                text.setWrappingWidth(410);
-                addColumn(extension, size, text);
-            } else if (Objects.equals(extension, "docx")) {
-                String content = getDocxContent(file.getAbsolutePath());
-                Text text = new Text(content);
-                text.setWrappingWidth(410);
-                addColumn(extension, size, text);
-            } else if (Objects.equals(extension, "xlsx")) {
-                String content = getXlsxContent(file.getAbsolutePath());
-                Text text = new Text(content);
-                text.setWrappingWidth(410);
-                addColumn(extension, size, text);
-            } else if (Objects.equals(extension, "pptx")) {
-                String content = getPptxContent(file.getAbsolutePath());
-                Text text = new Text(content);
-                text.setWrappingWidth(410);
-                addColumn(extension, size, text);
-            } else if (Objects.equals(extension, "jpg")
-                    || Objects.equals(extension, "png")
-                    || Objects.equals(extension, "bmp")) {
-                ImageView imageView = new ImageView(new Image(file.getAbsolutePath()));
-                addColumn(extension, size, imageView);
+            switch (extension) {
+                case ("txt") -> {
+                    String content = getTxtContent(br);
+                    Text text = new Text(content);
+                    text.setWrappingWidth(410);
+                    addColumn(extension, size, text);
+                }
+                case ("docx") -> {
+                    String content2 = getDocxContent(file.getAbsolutePath());
+                    Text text2 = new Text(content2);
+                    text2.setWrappingWidth(410);
+                    addColumn(extension, size, text2);
+                }
+                case ("xlsx") -> {
+                    String content3 = getXlsxContent(file.getAbsolutePath());
+                    Text text3 = new Text(content3);
+                    text3.setWrappingWidth(410);
+                    addColumn(extension, size, text3);
+                }
+                case ("pptx") -> {
+                    String content4 = getPptxContent(file.getAbsolutePath());
+                    Text text4 = new Text(content4);
+                    text4.setWrappingWidth(410);
+                    addColumn(extension, size, text4);
+                }
+                default -> {
+                    ImageView imageView = new ImageView(new Image(file.getAbsolutePath()));
+                    addColumn(extension, size, imageView);
+                }
             }
 
             tableView.setItems(dataRows);
