@@ -42,71 +42,76 @@ public class HelloController {
 
     //Method for downloading file and output data to table
     @FXML
-    protected void openFile() {
+    private void openFile() {
 
         FileChooser fileChooser = new FileChooser();
         Stage stage = (Stage) tableView.getScene().getWindow();
 
         try {
-            File file = fileChooser.showOpenDialog(stage);
-            FileReader fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
-
-            String extension = file.getName().split("\\.")[1];
-            String size = String.format("%.3f", (double) file.length() / 1024) + " Кб";
-
-            columnExtension.setCellValueFactory(new PropertyValueFactory<Row, String>("extension"));
-            columnSize.setCellValueFactory(new PropertyValueFactory<Row, String>("size"));
-
-            switch (extension) {
-                case ("txt") -> {
-                    String content = getTxtContent(br);
-                    Text text = new Text(content);
-                    text.setWrappingWidth(410);
-                    addColumn(extension, size, text);
-                }
-                case ("docx") -> {
-                    String content2 = getDocxContent(file.getAbsolutePath());
-                    Text text2 = new Text(content2);
-                    text2.setWrappingWidth(410);
-                    addColumn(extension, size, text2);
-                }
-                case ("xlsx") -> {
-                    String content3 = getXlsxContent(file.getAbsolutePath());
-                    Text text3 = new Text(content3);
-                    text3.setWrappingWidth(410);
-                    addColumn(extension, size, text3);
-                }
-                case ("pptx") -> {
-                    String content4 = getPptxContent(file.getAbsolutePath());
-                    Text text4 = new Text(content4);
-                    text4.setWrappingWidth(410);
-                    addColumn(extension, size, text4);
-                }
-                case ("jpg"), ("png"), ("bmp") -> {
-                    ImageView imageView = new ImageView(new Image(file.getAbsolutePath()));
-                    addColumn(extension, size, imageView);
-                }
-                default -> {
-                    Text text = new Text("Нет такого расширения");
-                    text.setWrappingWidth(410);
-                    addColumn(extension, size, text);
-                }
-            }
-
-            tableView.setItems(dataRows);
+            AddNewColumnAndData(fileChooser, stage);
         } catch (IOException e) {
             System.out.println("Cant read the file");
         }
     }
 
-    //Method for clearing data from array
+    private void AddNewColumnAndData(FileChooser fileChooser, Stage stage) throws FileNotFoundException {
+        File file = fileChooser.showOpenDialog(stage);
+        FileReader fr = new FileReader(file);
+        BufferedReader br = new BufferedReader(fr);
+
+        String extension = file.getName().split("\\.")[1];
+        String size = String.format("%.3f", (double) file.length() / 1024) + " Кб";
+
+        columnExtension.setCellValueFactory(new PropertyValueFactory<Row, String>("extension"));
+        columnSize.setCellValueFactory(new PropertyValueFactory<Row, String>("size"));
+
+        AddColumnByExtensions(file, br, extension, size);
+
+        tableView.setItems(dataRows);
+    }
+
+    private void AddColumnByExtensions(File file, BufferedReader br, String extension, String size) {
+        switch (extension) {
+            case ("txt") -> {
+                String content = getTxtContent(br);
+                Text text = new Text(content);
+                text.setWrappingWidth(410);
+                addColumn(extension, size, text);
+            }
+            case ("docx") -> {
+                String content2 = getDocxContent(file.getAbsolutePath());
+                Text text2 = new Text(content2);
+                text2.setWrappingWidth(410);
+                addColumn(extension, size, text2);
+            }
+            case ("xlsx") -> {
+                String content3 = getXlsxContent(file.getAbsolutePath());
+                Text text3 = new Text(content3);
+                text3.setWrappingWidth(410);
+                addColumn(extension, size, text3);
+            }
+            case ("pptx") -> {
+                String content4 = getPptxContent(file.getAbsolutePath());
+                Text text4 = new Text(content4);
+                text4.setWrappingWidth(410);
+                addColumn(extension, size, text4);
+            }
+            case ("jpg"), ("png"), ("bmp") -> {
+                ImageView imageView = new ImageView(new Image(file.getAbsolutePath()));
+                addColumn(extension, size, imageView);
+            }
+            default -> {
+                Text text = new Text("Нет такого расширения");
+                text.setWrappingWidth(410);
+                addColumn(extension, size, text);
+            }
+        }
+    }
     @FXML
-    protected void clearTable() {
+    private void clearTable() {
         dataRows.clear();
     }
 
-    @FXML
     protected <T> void addColumn(String extension, String size, T data) {
         dataRows.add(new Row(extension, size, data));
 
@@ -119,8 +124,7 @@ public class HelloController {
         }
     }
 
-    @FXML
-    protected <T> TableColumn<Row, T> getLastColumn() {
+    private  <T> TableColumn<Row, T> getLastColumn() {
         if (tableView.getColumns().size() == 2) {
             TableColumn<Row, T> tableColumn = new TableColumn<Row, T>();
             tableColumn.setText("Содержимое");
@@ -132,8 +136,7 @@ public class HelloController {
     }
 
 
-    @FXML
-    protected String getTxtContent(BufferedReader br) {
+    private String getTxtContent(BufferedReader br) {
         String text = "";
 
         try {
@@ -150,8 +153,7 @@ public class HelloController {
         return text;
     }
 
-    @FXML
-    protected String getDocxContent(String path) {
+    private String getDocxContent(String path) {
         String text = "";
         try {
             FileInputStream fileInputStream = new FileInputStream(path);
@@ -168,8 +170,7 @@ public class HelloController {
         return text;
     }
 
-    @FXML
-    protected String getXlsxContent(String path) {
+    private String getXlsxContent(String path) {
         String text = "";
         try {
             FileInputStream fileInputStream = new FileInputStream(path);
@@ -186,8 +187,7 @@ public class HelloController {
         return text;
     }
 
-    @FXML
-    protected String getPptxContent(String path) {
+    private String getPptxContent(String path) {
         String text = "";
         try {
             FileInputStream fileInputStream = new FileInputStream(path);
