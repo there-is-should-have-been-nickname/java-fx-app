@@ -83,9 +83,14 @@ public class HelloController {
                     text4.setWrappingWidth(410);
                     addColumn(extension, size, text4);
                 }
-                default -> {
+                case ("jpg"), ("png"), ("bmp") -> {
                     ImageView imageView = new ImageView(new Image(file.getAbsolutePath()));
                     addColumn(extension, size, imageView);
+                }
+                default -> {
+                    Text text = new Text("Нет такого расширения");
+                    text.setWrappingWidth(410);
+                    addColumn(extension, size, text);
                 }
             }
 
