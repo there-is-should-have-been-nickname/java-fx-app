@@ -11,9 +11,8 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import javafx.util.Callback;
+import org.apache.poi.sl.image.ImageHeaderBitmap;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.xslf.usermodel.SlideLayout;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -22,8 +21,10 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
+import java.lang.Object;
 
 public class HelloController {
     //Required variables for input and output data
@@ -65,12 +66,12 @@ public class HelloController {
         columnExtension.setCellValueFactory(new PropertyValueFactory<Row, String>("extension"));
         columnSize.setCellValueFactory(new PropertyValueFactory<Row, String>("size"));
 
-        AddColumnByExtensions(file, br, extension, size);
+        AddColumnByExtensions(file, br, extension, size, (int)file.length());
 
         tableView.setItems(dataRows);
     }
 
-    private void AddColumnByExtensions(File file, BufferedReader br, String extension, String size) {
+    private void AddColumnByExtensions(File file, BufferedReader br, String extension, String size, Integer fullSize) {
         switch (extension) {
             case ("txt") -> {
                 String content = getTxtContent(br);
@@ -97,7 +98,40 @@ public class HelloController {
                 addColumn(extension, size, text4);
             }
             case ("jpg"), ("png"), ("bmp") -> {
-                ImageView imageView = new ImageView(new Image(file.getAbsolutePath()));
+                Image image = new Image(file.getAbsolutePath());
+
+                byte[] arrBytes = getBinaryFile(file.getAbsolutePath());
+                //14 первых байт - BITMAPFILEHEADER
+                //4 след байта - размер структуры в байтах, по размеру определяется версия:
+                //12 байт - версия CORE
+                //40 байт - версия 3
+                //108 байт - версия 4
+                //124 байта - версия 5
+                //4 след байта - ширина растра
+                //4 след байта - высота растра
+                //2 след байта - значение 1, для значков в винде
+                //2 след байта - кол-во бит на пиксель
+
+                //Integer width = (int)image.getWidth();
+                Integer width = 0;
+                //Integer height = (int)image.getHeight();
+                Integer height = 0;
+                Integer deep = 0;
+
+                if (extension.equals("bmp")) {
+                    deep = arrBytes[28] * (int)Math.pow(255, 0) + arrBytes[29] * (int)Math.pow(255, 1);
+                    width = arrBytes[18] * (int)Math.pow(255, 0) + arrBytes[19] * (int)Math.pow(255, 1) +
+                            arrBytes[20] * (int)Math.pow(255, 2) + arrBytes[21] * (int)Math.pow(255, 3);
+                    height = arrBytes[22] * (int)Math.pow(255, 0) + arrBytes[23] * (int)Math.pow(255, 1) +
+                            arrBytes[24] * (int)Math.pow(255, 2) + arrBytes[25] * (int)Math.pow(255, 3);
+                } else {
+                    width = (int)image.getWidth();
+                    height = (int)image.getHeight();
+                }
+
+                size += "\n" + width + "x" + height + "\n" + deep;
+                ImageView imageView = new ImageView(image);
+
                 addColumn(extension, size, imageView);
             }
             default -> {
@@ -107,6 +141,26 @@ public class HelloController {
             }
         }
     }
+
+    private byte[] getBinaryFile(String path) {
+        File bFile = new File(path);
+        FileInputStream fileInputStream;
+        try {
+            fileInputStream = new FileInputStream(bFile);
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+            try {
+                //byte[] content = Files.readAllBytes(Paths.get(bfile.getAbsolutePath()));
+                byte[] data = new byte[bufferedInputStream.available()];
+                bufferedInputStream.read(data);
+                return data;
+            } finally {
+                bufferedInputStream.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @FXML
     private void clearTable() {
         dataRows.clear();
