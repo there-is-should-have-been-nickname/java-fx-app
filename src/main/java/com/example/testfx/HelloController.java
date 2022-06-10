@@ -97,41 +97,57 @@ public class HelloController {
                 text4.setWrappingWidth(410);
                 addColumn(extension, size, text4);
             }
-            case ("jpg"), ("png"), ("bmp") -> {
+            case ("jpg"), ("png") -> {
                 Image image = new Image(file.getAbsolutePath());
+                Integer width = (int)image.getWidth();
+                Integer height = (int)image.getHeight();
 
-                byte[] arrBytes = getBinaryFile(file.getAbsolutePath());
+                size += "\n" + width + "x" + height;
+                ImageView imageView = new ImageView(image);
+                addColumn(extension, size, imageView);
+            }
+            case ("bmp") -> {
+                Image image = new Image(file.getAbsolutePath());
                 //14 первых байт - BITMAPFILEHEADER
-                //4 след байта - размер структуры в байтах, по размеру определяется версия:
-                //12 байт - версия CORE
-                //40 байт - версия 3
-                //108 байт - версия 4
-                //124 байта - версия 5
+                //4 след байта - размер структуры в байтах, по размеру определяется версия
                 //4 след байта - ширина растра
                 //4 след байта - высота растра
                 //2 след байта - значение 1, для значков в винде
                 //2 след байта - кол-во бит на пиксель
+                byte[] arrBytes = getBinaryFile(file.getAbsolutePath());
+                Integer deep = arrBytes[28] * (int)Math.pow(256, 0) + arrBytes[29] * (int)Math.pow(256, 1);
+                escapeNegativeNumbers(arrBytes, 18, 4);
+                Integer width = arrBytes[18] * (int)Math.pow(256, 0) + arrBytes[19] * (int)Math.pow(256, 1) +
+                        arrBytes[20] * (int)Math.pow(256, 2) + arrBytes[21] * (int)Math.pow(256, 3);
+                escapeNegativeNumbers(arrBytes, 22, 4);
+                Integer height = arrBytes[22] * (int)Math.pow(256, 0) + arrBytes[23] * (int)Math.pow(256, 1) +
+                        arrBytes[24] * (int)Math.pow(256, 2) + arrBytes[25] * (int)Math.pow(256, 3);
 
-                //Integer width = (int)image.getWidth();
-                Integer width = 0;
-                //Integer height = (int)image.getHeight();
-                Integer height = 0;
-                Integer deep = 0;
+                Integer typeStorage = arrBytes[30] * (int)Math.pow(256, 0) + arrBytes[31] * (int)Math.pow(256, 1) +
+                        arrBytes[32] * (int)Math.pow(256, 2) + arrBytes[33] * (int)Math.pow(256, 3);
 
-                if (extension.equals("bmp")) {
-                    deep = arrBytes[28] * (int)Math.pow(255, 0) + arrBytes[29] * (int)Math.pow(255, 1);
-                    width = arrBytes[18] * (int)Math.pow(255, 0) + arrBytes[19] * (int)Math.pow(255, 1) +
-                            arrBytes[20] * (int)Math.pow(255, 2) + arrBytes[21] * (int)Math.pow(255, 3);
-                    height = arrBytes[22] * (int)Math.pow(255, 0) + arrBytes[23] * (int)Math.pow(255, 1) +
-                            arrBytes[24] * (int)Math.pow(255, 2) + arrBytes[25] * (int)Math.pow(255, 3);
-                } else {
-                    width = (int)image.getWidth();
-                    height = (int)image.getHeight();
+                size += "\n" + width + "x" + height + "\n"
+                        + deep + " бит на пиксель" + "\n"
+                        + getTypeStorageDesc(typeStorage) + " способ хранения" + "\n";
+
+                Integer versionSize = arrBytes[14] * (int)Math.pow(256, 0) + arrBytes[15] * (int)Math.pow(256, 1) +
+                        arrBytes[16] * (int)Math.pow(256, 2) + arrBytes[17] * (int)Math.pow(256, 3);
+
+                if (versionSize == 108) {
+                    Integer typeColorSpace = arrBytes[74] * (int)Math.pow(256, 0) + arrBytes[75] * (int)Math.pow(256, 1) +
+                            arrBytes[76] * (int)Math.pow(256, 2) + arrBytes[77] * (int)Math.pow(256, 3);
+                    size += "\n" + typeColorSpace + " вид цветового пространства";
+                } else if (versionSize == 124) {
+                    Integer typeColorSpace = arrBytes[74] * (int)Math.pow(256, 0) + arrBytes[75] * (int)Math.pow(256, 1) +
+                            arrBytes[76] * (int)Math.pow(256, 2) + arrBytes[77] * (int)Math.pow(256, 3);
+                    Integer renderPrefer = arrBytes[126] * (int)Math.pow(256, 0) + arrBytes[127] * (int)Math.pow(256, 1) +
+                            arrBytes[128] * (int)Math.pow(256, 2) + arrBytes[129] * (int)Math.pow(256, 3);
+
+                    size += "\n" + typeColorSpace + " вид цветового пространства" +
+                            "\n" + renderPrefer + " предпочтение при рендеринге растра";
                 }
 
-                size += "\n" + width + "x" + height + "\n" + deep;
                 ImageView imageView = new ImageView(image);
-
                 addColumn(extension, size, imageView);
             }
             default -> {
@@ -140,6 +156,29 @@ public class HelloController {
                 addColumn(extension, size, text);
             }
         }
+    }
+    private void escapeNegativeNumbers(byte[] arr, Integer start, Integer count) {
+        for (Integer i = start; i < start + count; ++i) {
+            arr[i] = (arr[i] > 0) ? arr[i] : (byte) (256 + arr[i]);
+        }
+    }
+
+    private String getTypeStorageDesc(Integer type) {
+        switch (type) {
+            case (0):
+                return "двумерный массив";
+            case (1), (2):
+                return "RLE кодирование";
+            case (3):
+                return "двумерный массив с масками цветовых каналов";
+            case (4):
+                return "встроенный JPEG файл";
+            case (5):
+                return "встроенный PNG файл";
+            case (6):
+                return "двумерный массив с масками цветовых каналов и альфа-каналов";
+        }
+        return "";
     }
 
     private byte[] getBinaryFile(String path) {
